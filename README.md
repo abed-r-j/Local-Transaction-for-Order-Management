@@ -10,6 +10,8 @@ Each method is annotated with @Transactional, ensuring that each update occurs i
 
 
 
+
+
 ### Configuration required in application.properties:
 
   spring.jpa.hibernate.ddl-auto=update
