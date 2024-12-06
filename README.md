@@ -1,119 +1,57 @@
 # Local Transaction for Order Management
 
-## Overview
+Hibernate and Spring Boot:
 
-This project demonstrates how to manage local transactions in an order management system using Spring and Hibernate/JPA.
+Used Spring Boot with Hibernate for ORM
+Leveraged Spring Data JPA repositories
+Used H2 in-memory database for simplicity
 
-## Features
 
-1. **Order Entity**: Building an `Order` entity class with required fields.
-2. **Transaction Service**: Building a transaction service to handle local transactions.
-3. **Methods Implementation**: Implementing methods for updating `accounting_id` and `payment_id` in separate transactions.
-4. **Entity Management**: Using Hibernate/JPA for entity management.
-5. **Transaction Rollbacks**: Handling transaction rollbacks in case of errors.
+Entities:
 
-Each method is annotated with `@Transactional`, ensuring that each update occurs in its own transaction. If an error occurs during either update, that specific transaction will be rolled back independently.
+Order and Inventory entities with JPA annotations
+Mapped to database tables
+Includes getters, setters, and constructors
 
-## Configuration
 
-Add the following configuration in `application.properties`:
+Transactions:
 
-```properties
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-```
+Used @Transactional annotations for local transactions
+Separate methods for updating accounting_id and payment_id
+Each transaction is atomic and follows ACID principles
 
-## Entity Class
 
-```java
-import javax.persistence.*;
+Repositories:
 
-@Entity
-@Table(name = "orders")
-public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    private String accountingId;
-    private String paymentId;
-    
-    // Getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public String getAccountingId() { return accountingId; }
-    public void setAccountingId(String accountingId) { this.accountingId = accountingId; }
-    
-    public String getPaymentId() { return paymentId; }
-    public void setPaymentId(String paymentId) { this.paymentId = paymentId; }
-}
-```
+JpaRepository for database operations
+Provides CRUD functionality out of the box
 
-## Transaction Service
 
-```java
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+Service Layer:
 
-@Service
-public class OrderTransactionService {
-    
-    @PersistenceContext
-    private EntityManager entityManager;
-    
-    @Transactional
-    public void updateAccountingId(Long orderId, String accountingId) {
-        Order order = entityManager.find(Order.class, orderId);
-        if (order != null) {
-            order.setAccountingId(accountingId);
-            entityManager.merge(order);
-        } else {
-            throw new RuntimeException("Order not found");
-        }
-    }
-    
-    @Transactional
-    public void updatePaymentId(Long orderId, String paymentId) {
-        Order order = entityManager.find(Order.class, orderId);
-        if (order != null) {
-            order.setPaymentId(paymentId);
-            entityManager.merge(order);
-        } else {
-            throw new RuntimeException("Order not found");
-        }
-    }
-}
-```
+OrderManagementService contains business logic
+Methods for creating orders, updating order details
+Checks inventory before creating orders
+Handles transaction management
 
-## Example Usage
 
-```java
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+Main Application:
 
-@Component
-public class OrderUpdateExample {
-    
-    @Autowired
-    private OrderTransactionService orderTransactionService;
-    
-    public void updateOrder(Long orderId) {
-        try {
-            // First transaction - update accounting ID
-            orderTransactionService.updateAccountingId(orderId, "ACC-" + System.currentTimeMillis());
-            
-            // Second transaction - update payment ID
-            orderTransactionService.updatePaymentId(orderId, "PAY-" + System.currentTimeMillis());
-        } catch (Exception e) {
-            // Handle exceptions
-            e.printStackTrace();
-        }
-    }
-}
-```
+Demonstrates usage of the order management system
+Shows order creation and updates
 
----
+
+
+Dependencies Required:
+
+Spring Boot Starter Data JPA
+Spring Boot Starter Web
+H2 Database
+Hibernate Core
+
+How to Run:
+
+Set up a Spring Boot project
+Add the mentioned dependencies
+Copy these files into your project structure
+Run the OrderManagementApplication
