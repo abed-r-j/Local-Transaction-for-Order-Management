@@ -3,7 +3,9 @@
 ## Hibernate and Spring Boot:
 
 . Used Spring Boot with Hibernate for ORM
+
 . Leveraged Spring Data JPA repositories
+
 . Used H2 in-memory database for simplicity
 
 
